@@ -62,6 +62,7 @@ model Map {
   id     String  @id @unique @default(cuid())
   width  Int
   height Int
+  thumbnailImageUrl String?
   name   String
   user   User @relation(fields: [userId], references: [id])
   userId String
