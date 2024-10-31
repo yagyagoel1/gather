@@ -29,7 +29,7 @@ model Space {
   id        String  @id @unique @default(cuid())
   name      String
   width     Int
-  height    Int?
+  height    Int
   thumbnail String?
   mapId     String?
   map       Map?    @relation(fields: [mapId], references: [id])
