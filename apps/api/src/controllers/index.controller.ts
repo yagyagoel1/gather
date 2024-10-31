@@ -50,6 +50,40 @@ const  postSignin = asyncHandler(async (req: Request, res: Response) => {
     return res.status(200).json({token:token})
 })
 
+const getAvatar = asyncHandler(async (req: Request, res: Response) => {
+    const avatar = await prisma.avatar.findMany()
+    return res.status(200).json({avatars:avatar})
+});
+const getBulkAvatar = asyncHandler(async (req: Request, res: Response) => {
+    const {ids} = req.query;
+    const avatar = await prisma.avatar.findMany({
+        where:{
+            id:{
+                in:ids as string[]
+            }
+        }
+    })
+    if (!avatar){
+        return res.status(400).json({message:"No avatar found"})
+    }
+    return res.status(200).json({avatars:avatar.map((item)=>({userId:item.id,imageUrl:item.imageUrl}))})
+});
+const postMetadata = asyncHandler(async (req: Request, res: Response) => {
+        const {avatarId} = req.body;
 
-export {postSignup,postSignin}
+        const updateAvatar= await prisma.user.update({
+            where:{
+                id:req.user.id
+            },
+            data:{
+                avatarId
+            }
+        })
+        if(updateAvatar){
+            return res.status(200).json({message:"Avatar updated"})
+        }
+        return res.status(400).json({message:"Avatar not updated"})
+
+    })
+export {postSignup,postSignin,postMetadata,getAvatar,getBulkAvatar}
 

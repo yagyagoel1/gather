@@ -24,7 +24,7 @@ function checkOverlap(sizes:Array<{height:number,width:number}>, positions:Array
     return false;
 }
 
-const CreateElement = asyncHandler(async (req:Request, res:Response) => {
+const createElement = asyncHandler(async (req:Request, res:Response) => {
 const {imageUrl,width,height,staticc}   = req.body;
 const validate = createElementSchema.safeParse({imageUrl,width,height,staticc})
 if(!validate.success){
@@ -153,4 +153,4 @@ const createMap = asyncHandler(async (req:Request, res:Response) => {
     return res.status(200).json({message:"Map created"})
     })
 
-export {CreateElement,updateElement,createAvatar,createMap}
+export {createElement,updateElement,createAvatar,createMap}
