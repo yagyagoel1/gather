@@ -54,6 +54,7 @@ const deleteSpace = asyncHandler(async (req: Request, res: Response) => {
     const {id} = req.params;
     const deleteSpace = await prisma.space.delete({
         where:{
+            userId:req.user.id,
             id
         }
     })
@@ -63,8 +64,12 @@ const deleteSpace = asyncHandler(async (req: Request, res: Response) => {
     return res.status(400).json({message:"Space not deleted"})
 });
 
-const getSpace = asyncHandler(async (req: Request, res: Response) => {
-    const space = await prisma.space.findMany()
+const getMySpaces = asyncHandler(async (req: Request, res: Response) => {
+    const space = await prisma.space.findMany({
+        where:{
+            userId:req.user.id
+        }
+})
     if (!space){
         return res.status(400).json({message:"Space not found"})
     }
@@ -226,3 +231,5 @@ const getSpaceElement = asyncHandler(async (req: Request, res: Response) => {
     }
     return res.status(200).json({elements:spaceElement.map((element)=>({id:element.id,x:element.x,y:element.y}))})
 });
+
+export { createSpace,deleteSpace,getMySpaces,getSpaceById,addElementToSpace,deleteElementFromSpace,getSpaceElement }

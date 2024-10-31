@@ -45,9 +45,6 @@ importers:
       '@jest/globals':
         specifier: ^29.7.0
         version: 29.7.0
-      '@repo/eslint-config':
-        specifier: workspace:*
-        version: link:../../packages/config-eslint
       '@repo/jest-presets':
         specifier: workspace:*
         version: link:../../packages/jest-presets
