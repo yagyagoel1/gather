@@ -126,6 +126,16 @@ export async function handleClientMessage(ws: WebSocket, message: string, user: 
 
       return !noOverlapX && !noOverlapY;
     });
+    // Check if user is out of bounds
+    if (x < 0 || y < 0) {
+      ws.send(
+        JSON.stringify({
+          type: 'movement-rejected',
+          payload: { x: spaces[user.spaceId].users[user.id].x, y: spaces[user.spaceId].users[user.id].y },
+        })
+      );
+      return user;
+    }
     if (overlap) {
       ws.send(
         JSON.stringify({
