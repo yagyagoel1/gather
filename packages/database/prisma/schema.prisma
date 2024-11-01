@@ -56,6 +56,7 @@ model Element {
   imageUrl String
   static   Boolean
   spaces   spaceElements[]
+  maps     mapElements[]
 }
 
 model Map {
@@ -73,10 +74,11 @@ model Map {
 model mapElements {
   id        String  @id @unique @default(cuid())
   mapId     String
-  elementId String?
+  elementId String
+  element   Element @relation(fields: [elementId], references: [id])
   map       Map     @relation(fields: [mapId], references: [id])
-  x         Int?
-  y         Int?
+  x         Int
+  y         Int
 }
 
 model Avatar {
