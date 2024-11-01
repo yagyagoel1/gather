@@ -2,6 +2,7 @@ import { Router } from "express";
 import { getAvatar, getBulkAvatar, postMetadata, postSignin, postSignup } from "../controllers/index.controller";
 import adminRouter from "./admin.route";
 import spaceRouter from "./space.route";
+import { authMiddleware } from "../middlewares/auth.middleware";
 
 
 const router:ReturnType<typeof Router>= Router();
