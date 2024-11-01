@@ -95,62 +95,68 @@ const createMap = asyncHandler(async (req:Request, res:Response) => {
     }
     try {
         const result = await prisma.$transaction(async (prisma) => {
-        const createMap = await prisma.map.create({
-            data:{
-                thumbnailImageUrl:thumbnail,
-                height: dimensions.split("x")[0],
-                width: dimensions.split("x")[1],
-                name:name,
-                userId: req.user.id,
-            }
-        });
-        let position:Array<{x:number,y:number}> =[]
+            // Create the map first
+            const createMap = await prisma.map.create({
+                data: {
+                    thumbnailImageUrl: thumbnail,
+                    height: parseInt(dimensions.split("x")[0]),
+                    width: parseInt(dimensions.split("x")[1]),
+                    name: name,
+                    userId: req.user.id,
+                }
+            });
     
-        defaultElements.map(async (element:{x:number,y:number}) => {
-            position.push(
-                {
-                    x:element.x,
-                    y:element.y,
+            const position = defaultElements.map((element:{x:number,y:number}) => ({
+                x: element.x,
+                y: element.y,
+            }));
+    
+            const elementsData = await Promise.all(
+                defaultElements.map((element:{id:string}) =>
+                    prisma.element.findFirst({
+                        where: {
+                            id: element.id
+                        }
+                    })
+                )
+            );
+    
+            const elements = elementsData.map(data => {
+                if (!data) {
+                    throw new Error("Element not found");
                 }
-            )
-            
+                return {
+                    height: data.height,
+                    width: data.width
+                };
+            });
+    
+            const overlap = checkOverlap(elements, position);
+            if (overlap) {
+                throw new Error("Overlap found");
+            }
+    
+            await Promise.all(
+                defaultElements.map((element:{id:string,x:number,y:number}) =>
+                    prisma.mapElements.create({
+                        data: {
+                            elementId: element.id,
+                            mapId: createMap.id,
+                            x: element.x,
+                            y: element.y
+                        }
+                    })
+                )
+            );
+    
+            return createMap;
         });
-        let elements: Array<{height:number,width:number}>= [];
-     defaultElements.map(async (element:{id:string}) => {
-            
-              const data =   await prisma.element.findFirst({
-                    where:{
-                        id:element.id
-                    }
-                })
-                if (data){
-                    elements.push({height:data.height,width:data.width})
-                }
-                else {
-                    throw new Error("Element not found")
-                }
-        });
-      const overlap=  checkOverlap(elements,position)
-      if (overlap){
-          throw new Error("Overlap found")
-      }
-        defaultElements.map(async (element:{id:string,x:number,y:number}) => {
-            await prisma.mapElements.create({
-                data:{
-                    elementId:element.id,
-                    mapId:createMap.id,
-                    x:element.x,
-                    y:element.y
-                }
-            })
-        })
-        return createMap;
-    })
+    return res.status(200).json({message:"Map created",mapId:result.id})
     } catch (error:any) {
         return res.status(400).json({message:error.message})
         
     }
-    return res.status(200).json({message:"Map created"})
+    
     })
 
 export {createElement,updateElement,createAvatar,createMap}

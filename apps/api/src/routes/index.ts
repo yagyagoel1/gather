@@ -13,8 +13,8 @@ router.post("/user/metadata",authMiddleware(["admin","user"]),postMetadata
 );
 router.get("/user/metadata/bulk",authMiddleware(["admin","user"]),getBulkAvatar);
 router.get("/avatar", authMiddleware(["admin","user"]), getAvatar);
-router.use("/space", authMiddleware(["admin","user"]),spaceRouter)
-router.use("/admin",authMiddleware(["admin","user"]),adminRouter)
+router.use("/space",spaceRouter)
+router.use("/admin",adminRouter)
 
 
 export default router;

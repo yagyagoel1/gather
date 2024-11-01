@@ -21,7 +21,7 @@ export const authMiddleware = (role:string[])=>{
    
 
   return  async (req: Request, res: Response, next: NextFunction) => {
-    let token = req.headers.Authorization;
+    let token = req.headers.Authorization || req.headers.authorization;
     if (!token) {
         return res.status(400).json({ message: "Unauthorized" });
     }

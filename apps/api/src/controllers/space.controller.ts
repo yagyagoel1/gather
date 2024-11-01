@@ -30,15 +30,15 @@ const createSpace = asyncHandler(async (req: Request, res: Response) => {
     if(!validate.success){
         return res.status(400).json({message:validate.error.message})
     }
-    if(dimensions.length !== 2){
+    if(dimensions.split("x").length !== 2){
         return res.status(400).json({message:"Invalid dimensions"})
     }
 
     const createSpace = await prisma.space.create({
         data:{
             name,
-            height:dimensions.split("x")[0],
-            width:dimensions.split("x")[1],
+            height:parseInt(dimensions.split("x")[0]),
+            width:parseInt(dimensions.split("x")[1]),
             mapId,
             thumbnail,
             userId:req.user.id
@@ -179,8 +179,9 @@ const addElementToSpace = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const deleteElementFromSpace = asyncHandler(async (req: Request, res: Response) => {
-    const {spaceId,elementId} = req.body;
-    const validate = deleteElementFromSpaceSchema.safeParse({spaceId,elementId})
+    const {spaceId} = req.body;
+    const {id} = req.params;
+    const validate = deleteElementFromSpaceSchema.safeParse({spaceId,id})
     if(!validate.success){
         return res.status(400).json({message:validate.error.message})
     }
@@ -199,7 +200,7 @@ const deleteElementFromSpace = asyncHandler(async (req: Request, res: Response) 
     const deleteSpaceElement = await prisma.spaceElements.delete({
         where:{
                 spaceId,
-                id:elementId,
+                id:id,
 
         }
     })
@@ -210,7 +211,7 @@ const deleteElementFromSpace = asyncHandler(async (req: Request, res: Response) 
 });
 
 const getSpaceElement = asyncHandler(async (req: Request, res: Response) => {
-    const {spaceId} = req.params;
+    const {spaceId} = req.body;
     const spaceElement = await prisma.spaceElements.findMany({
         where:{
             spaceId
@@ -229,7 +230,7 @@ const getSpaceElement = asyncHandler(async (req: Request, res: Response) => {
     if (!spaceElement){
         return res.status(400).json({message:"Space element not found"})
     }
-    return res.status(200).json({elements:spaceElement.map((element)=>({id:element.id,x:element.x,y:element.y}))})
+    return res.status(200).json({elements:spaceElement.map((element)=>({id:element.id,x:element.x,y:element.y,imageUrl:element.element.imageUrl}))})
 });
 
 export { createSpace,deleteSpace,getMySpaces,getSpaceById,addElementToSpace,deleteElementFromSpace,getSpaceElement }

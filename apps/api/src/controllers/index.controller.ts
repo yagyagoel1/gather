@@ -1,7 +1,7 @@
 import type { Request, Response } from "express";
 import prisma ,{Role} from "@repo/db"
 import { asyncHandler } from "../utils/asyncHandler";
-import { signupSchema } from "../validators/index.validator";
+import { loginSchema, signupSchema } from "../validators/index.validator";
 import { compareHash, hashData } from "../utils/hashData";
 import { createToken } from "../utils/jwtToken";
 
@@ -31,7 +31,7 @@ const postSignup = asyncHandler(async (req: Request, res: Response) => {
 
 const  postSignin = asyncHandler(async (req: Request, res: Response) => {
     const { username,password } = req.body;
-    const validate=  signupSchema.safeParse({username,password})
+    const validate=  loginSchema.safeParse({username,password})
     if(!validate.success){
         return res.status(400).json({message:validate.error.message})
     }
@@ -46,7 +46,7 @@ const  postSignin = asyncHandler(async (req: Request, res: Response) => {
     if(!(await compareHash(password,user.password))){
         return res.status(400).json({message:"Invalid password"})
     }
-    const token =createToken({id:user.id})
+    const token = await createToken({id:user.id})
     return res.status(200).json({token:token})
 })
 
@@ -55,18 +55,42 @@ const getAvatar = asyncHandler(async (req: Request, res: Response) => {
     return res.status(200).json({avatars:avatar})
 });
 const getBulkAvatar = asyncHandler(async (req: Request, res: Response) => {
-    const {ids} = req.query;
-    const avatar = await prisma.avatar.findMany({
+    let {ids} = req.query;
+    if (!ids){
+        return res.status(400).json({message:"Ids not found"})
+    }
+    let idArray: string[];
+    if (Array.isArray(ids)) {
+        idArray = ids as string[];
+    } else {
+        try {
+            const cleanedIds = (ids as string).replace(/^\[|\]$/g, '');
+            idArray = cleanedIds.split(',').map(id => id.trim());
+        } catch (error) {
+            return res.status(400).json({ message: "Invalid ids format" });
+        }
+    }
+    const avatar = await prisma.user.findMany({
         where:{
-            id:{
-                in:ids as string[]
+
+                id:{
+                    in:idArray
+                }
+        },
+        select:{
+            id:true,
+            avatar:{
+                select:{
+                    imageUrl:true
             }
         }
-    })
+    }
+
+})
     if (!avatar){
         return res.status(400).json({message:"No avatar found"})
     }
-    return res.status(200).json({avatars:avatar.map((item)=>({userId:item.id,imageUrl:item.imageUrl}))})
+    return res.status(200).json({avatars:avatar.map((item)=>({userId:item.id,imageUrl:item.avatar?.imageUrl}))})
 });
 const postMetadata = asyncHandler(async (req: Request, res: Response) => {
         const {avatarId} = req.body;

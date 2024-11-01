@@ -17,6 +17,5 @@ export const addElementToSpaceSchema = z.object({
 
 export const deleteElementFromSpaceSchema = z.object({
     spaceId: z.string(),
-    elementId: z.string(),
+    id: z.string(),
     });
-    
