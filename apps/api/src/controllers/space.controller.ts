@@ -33,6 +33,23 @@ const createSpace = asyncHandler(async (req: Request, res: Response) => {
     if(dimensions.split("x").length !== 2){
         return res.status(400).json({message:"Invalid dimensions"})
     }
+    const map = await prisma.mapElements.findMany({
+        
+    })
+    const mapElements = await prisma.mapElements.findMany({
+        where:{
+            mapId,
+        },select:{
+            x:true,
+            y:true,
+            elementId:true,
+
+        }
+
+    })
+    if(!mapElements || mapElements.length === 0){
+        return res.status(400).json({message:"Map elements not found"})
+    }
 
     const createSpace = await prisma.space.create({
         data:{
@@ -41,17 +58,30 @@ const createSpace = asyncHandler(async (req: Request, res: Response) => {
             width:parseInt(dimensions.split("x")[1]),
             mapId,
             thumbnail,
-            userId:req.user.id
+            userId:req.user.id,
+            elements:{
+                create:mapElements.map((element)=>({
+                    x:element.x ,
+                    y:element.y ,
+                    elementId:element.elementId,
+                }))
+            }
         }
     })
-    if(createSpace){
-        return res.status(200).json({spaceId:createSpace.id})
+    if(!createSpace){
+        return res.status(400).json({message:"Space not created"})
+        
     }
-    return res.status(400).json({message:"Space not created"})
+    return res.status(200).json({spaceId:createSpace.id})
 });
 
 const deleteSpace = asyncHandler(async (req: Request, res: Response) => {
     const {id} = req.params;
+    const spaceElement = await prisma.spaceElements.deleteMany({
+        where:{
+            spaceId:id
+        }
+    })
     const deleteSpace = await prisma.space.delete({
         where:{
             userId:req.user.id,

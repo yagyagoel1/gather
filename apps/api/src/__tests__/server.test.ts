@@ -178,25 +178,25 @@ describe("space dashboard", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("dimensions");
     expect(response.body).toHaveProperty("elements");
-    expect(response.body.elements).toHaveLength(0);
+    expect(response.body.elements).toHaveLength(3);
   })
   it("update an element should return 200", async () => {//doubt about id(as admin is  creating id cant be chair1) and  (the width and height of the element is defined by admin)
     const response = await supertest(createServer())
       .post(`/api/v1/space/element`).set("Authorization", `Bearer ${token}`).send({
         "elementId": elementId,
         "spaceId": spaceId,
-        "x": 50,
-        "y": 20
+        "x": 52,
+        "y": 21
       })
     expect(response.statusCode).toBe(200);
   })
   it("update an element should return 400", async () => {
     const response = await supertest(createServer())
       .post(`/api/v1/space/element`).set("Authorization", `Bearer ${token}`).send({
-        "elementId": elementId,
+        "elementId": "chair2",
         "spaceId": spaceId,
-        "x": 50,
-        "y": 20
+        "x": 1,
+        "y": 13
       })
     expect(response.statusCode).toBe(400);
   })
@@ -234,7 +234,7 @@ describe("space dashboard", () => {
       })
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("elements");
-    expect(response.body.elements).toHaveLength(1);
+    expect(response.body.elements).toHaveLength(4);
     expect(response.body.elements[0]).toHaveProperty("id");
     expect(response.body.elements[0]).toHaveProperty("x");
     expect(response.body.elements[0]).toHaveProperty("y");

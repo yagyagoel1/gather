@@ -110,17 +110,15 @@ const createMap = asyncHandler(async (req:Request, res:Response) => {
                 x: element.x,
                 y: element.y,
             }));
-    
             const elementsData = await Promise.all(
-                defaultElements.map((element:{id:string}) =>
-                    prisma.element.findFirst({
+                defaultElements.map((element:{elementId:string}) =>{
+                    return prisma.element.findFirst({
                         where: {
-                            id: element.id
+                            id: element.elementId
                         }
-                    })
+                    })}
                 )
             );
-    
             const elements = elementsData.map(data => {
                 if (!data) {
                     throw new Error("Element not found");
@@ -137,15 +135,14 @@ const createMap = asyncHandler(async (req:Request, res:Response) => {
             }
     
             await Promise.all(
-                defaultElements.map((element:{id:string,x:number,y:number}) =>
-                    prisma.mapElements.create({
+                defaultElements.map((element:{elementId:string,x:number,y:number}) =>{return prisma.mapElements.create({
                         data: {
-                            elementId: element.id,
+                            elementId: element.elementId,
                             mapId: createMap.id,
                             x: element.x,
                             y: element.y
                         }
-                    })
+                    })}
                 )
             );
     
