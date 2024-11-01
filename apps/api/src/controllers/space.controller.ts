@@ -20,6 +20,7 @@ function checkSpaceElementOverLap(element:Array<{height:number,width:number ,x:n
                 return true;
             }
         }
+
     return false;
 }
 
@@ -33,9 +34,6 @@ const createSpace = asyncHandler(async (req: Request, res: Response) => {
     if(dimensions.split("x").length !== 2){
         return res.status(400).json({message:"Invalid dimensions"})
     }
-    const map = await prisma.mapElements.findMany({
-        
-    })
     const mapElements = await prisma.mapElements.findMany({
         where:{
             mapId,
@@ -43,10 +41,21 @@ const createSpace = asyncHandler(async (req: Request, res: Response) => {
             x:true,
             y:true,
             elementId:true,
+            map:{
+                select:{
+                    height:true,
+                    width:true
+
+                }
+            }
 
         }
 
     })
+    if(parseInt(dimensions.split("x")[0]) > mapElements[0].map.height || parseInt(dimensions.split("x")[1]) > mapElements[0].map.width){
+        return res.status(400).json({message:"Invalid dimensions"})
+    }
+
     if(!mapElements || mapElements.length === 0){
         return res.status(400).json({message:"Map elements not found"})
     }
@@ -193,6 +202,9 @@ const addElementToSpace = asyncHandler(async (req: Request, res: Response) => {
    const overlap=  checkSpaceElementOverLap(elements,newElement)
    if (overlap){
        return res.status(400).json({message:"Element overlap"})
+    }
+    if(x + element.width > space.width || y + element.height > space.height){
+        return res.status(400).json({message:"Element out of space dimensions  "})
     }
     const createSpaceElement = await prisma.spaceElements.create({
         data:{
