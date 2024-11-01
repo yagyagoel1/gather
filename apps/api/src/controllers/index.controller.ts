@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import prisma  from "@repo/db"
+import prisma ,{Role} from "@repo/db"
 import { asyncHandler } from "../utils/asyncHandler";
 import { signupSchema } from "../validators/index.validator";
 import { compareHash, hashData } from "../utils/hashData";
@@ -19,7 +19,7 @@ const postSignup = asyncHandler(async (req: Request, res: Response) => {
         data:{
             username,
             password:hashedPassword,
-            role:type
+            role:type=="admin"?Role.admin:Role.user
         }
     })
     if (createUser){
