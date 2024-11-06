@@ -8,7 +8,7 @@ export const asyncHandler  = (requestHandler:any)=>{
             await requestHandler(req,res,next)
         }catch(error){
             console.error("error in asyncHandler",error)
-            res.status(400).json({message:"Internal Server Error"})
+            res.status(500).json({message:"Internal Server Error"})
         }
     }
 }

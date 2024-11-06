@@ -52,13 +52,14 @@ const createSpace = asyncHandler(async (req: Request, res: Response) => {
         }
 
     })
-    if(parseInt(dimensions.split("x")[0]) > mapElements[0].map.height || parseInt(dimensions.split("x")[1]) > mapElements[0].map.width){
-        return res.status(400).json({message:"Invalid dimensions"})
-    }
-
     if(!mapElements || mapElements.length === 0){
         return res.status(400).json({message:"Map elements not found"})
     }
+    if(parseInt(dimensions.split("x")[0]) > mapElements[0].map.height || parseInt(dimensions.split("x")[1]) > mapElements[0].map.width){
+        return res.status(400).json({message:"Invalid dimensions"})
+    } 
+
+
 
     const createSpace = await prisma.space.create({
         data:{
@@ -238,7 +239,7 @@ const deleteElementFromSpace = asyncHandler(async (req: Request, res: Response) 
     if(space.userId !== req.user.id){
         return res.status(400).json({message:"Space not owned by user"})
     }
-
+    try{
     const deleteSpaceElement = await prisma.spaceElements.delete({
         where:{
                 spaceId,
@@ -249,7 +250,9 @@ const deleteElementFromSpace = asyncHandler(async (req: Request, res: Response) 
     if(deleteSpaceElement){
         return res.status(200).json({elementId:deleteSpaceElement.id})
     }
+}catch(error){
     return res.status(400).json({message:"Element not deleted from space"})
+}
 });
 
 const getSpaceElement = asyncHandler(async (req: Request, res: Response) => {
