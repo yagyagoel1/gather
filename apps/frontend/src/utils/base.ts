@@ -1,2 +1,2 @@
-export const API_BASE_URL='http://localhost:5001';
-export const WS_BASE_URL='ws://localhost:4001';
+export const API_BASE_URL='https://gather.yagyagoel.dev';
+export const WS_BASE_URL='ws://gatherws.yagyagoel.dev';
