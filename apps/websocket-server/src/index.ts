@@ -56,8 +56,8 @@ function removeUserFromSpace(user: any) {
 
 setInterval(() => {
     console.log('pinging');
-        console.log(clients);
-        console.log(spaces)
+        // console.log(clients);
+        console.log(JSON.stringify(spaces))
     wss.clients.forEach((ws: WebSocket) => {
         
         const clientData = clients.get(ws);

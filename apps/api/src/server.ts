@@ -12,7 +12,7 @@ export const createServer = (): Express => {
     .use(urlencoded({ extended: true }))
     .use(json())
     .use(cors(
-      { origin: process.env.ORIGIN || "http://localhost:3000" }
+      { origin: "http://localhost:5173" }
     ))
 
     app.use("/api/v1", indexRouter);

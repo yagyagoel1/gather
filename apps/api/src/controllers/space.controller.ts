@@ -256,7 +256,8 @@ const deleteElementFromSpace = asyncHandler(async (req: Request, res: Response) 
 });
 
 const getSpaceElement = asyncHandler(async (req: Request, res: Response) => {
-    const {spaceId} = req.body;
+    const {id } = req.params;
+    const spaceId = id;
     const spaceElement = await prisma.spaceElements.findMany({
         where:{
             spaceId
