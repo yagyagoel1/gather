@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../utils/base';
 
 const SignUp = () => {
   const [email, setEmail] = useState('');
@@ -11,7 +12,7 @@ const SignUp = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5001/api/v1/signup', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/signup`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username:email, password, name,type:"user" }),

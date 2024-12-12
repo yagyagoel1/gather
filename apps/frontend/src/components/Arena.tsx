@@ -1,4 +1,7 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL, WS_BASE_URL } from '../utils/base';
 
 interface User {
   x: number;
@@ -13,6 +16,7 @@ interface Params {
 
 
 const Arena = () => {
+  const navigate = useNavigate(); 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -23,7 +27,7 @@ const Arena = () => {
 
   useEffect(() => {
     // Remove the "Example:" text and add proper error logging
-    fetch(`http://localhost:5001/api/v1/space/elements/${params.spaceId}`, {
+    fetch(`${API_BASE_URL}/api/v1/space/elements/${params.spaceId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -45,13 +49,17 @@ const Arena = () => {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    // const token = urlParams.get('token') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtNGtpZHI1NjAwMDBwbWlkNDgzcWYyaDQiLCJpYXQiOjE3MzM5NTg5MzcsImV4cCI6MTc1NDk0OTM3fQ.oWRq4DOjckuNQ8_ruatG3I3RPH2i4GkvcqhkfcDT8O8';
 
-    const token = urlParams.get('token') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNtNGtkcTkyYTAwMDAxMnpweHkxNmhwamUiLCJpYXQiOjE3MzM5NTExMjIsImV4cCI6MTc2NTQ4NzEyMn0.rzZwnChM20FqkRdm-EzmpZGb4hJd9NwJ-H40GOK88MA';
-    const spaceId = urlParams.get('spaceId') || 'cm4kidr8m000cpmids94a82gk';
+    const token = urlParams.get('token') ||""
+    if(!token||token===""){
+      toast.error('Token not found');
+      navigate('/signin')
+    }
+
+    const spaceId = urlParams.get('spaceId') || 'cm4kpiix6000ncwgugbdpw23m';
     setParams({ token, spaceId });
 
-    wsRef.current = new WebSocket('ws://localhost:3000'); // Replace with your WS_URL
+    wsRef.current = new WebSocket(`${WS_BASE_URL}`); // Replace with your WS_URL
     
     wsRef.current.onopen = () => {
       wsRef.current?.send(JSON.stringify({

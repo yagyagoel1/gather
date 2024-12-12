@@ -74,6 +74,6 @@ setInterval(() => {
 }, PING_INTERVAL);
 
 
-server.listen(3000, () => {
-    console.log('WebSocket server is running on ws://localhost:3000');
+server.listen(4001, () => {
+    console.log(`WebSocket server is running on ws://localhost:${process.env.WS_PORT||4001}`);
 });

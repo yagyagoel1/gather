@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
+import { API_BASE_URL } from '../utils/base';
 
 const SignIn = () => {
   const [email, setEmail] = useState('');
@@ -10,7 +11,7 @@ const SignIn = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('http://localhost:5001/api/v1/signin', {
+      const response = await fetch(`${API_BASE_URL}/api/v1/signin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username:email, password }),
@@ -18,7 +19,7 @@ const SignIn = () => {
       const data = await response.json();
       if (data.token) {
         toast.success('Sign in successful');
-        navigate(`/arena?token=${data.token}&spaceId=cm4kidr8m000cpmids94a82gk`);
+        navigate(`/arena?token=${data.token}&spaceId=cm4kpiix6000ncwgugbdpw23m`);
       }
     } catch (error) {
         toast.error('Sign in failed:');

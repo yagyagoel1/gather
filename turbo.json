@@ -1,12 +1,15 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [".env"],
   "tasks": {
+    
     "db:generate": {
       "cache": false
     },
     "db:push": {
       "cache": false
     },
+    
     "build": {
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "dependsOn": ["^build"],
@@ -29,6 +32,12 @@
       "dependsOn": ["^build"]
     },
     "dev": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+    "start": {
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "dependsOn": ["^build"],
       "cache": false,
       "persistent": true
